@@ -1,0 +1,55 @@
+{% extends 'layout.html' %}
+{% block content %}
+
+<div class="wrapper">
+    <div class="main-title-container">
+        <h1>{{ title }}</h1>
+    </div>
+    <div class="card-container">
+        <div class="card">
+            <div class="progress-indicator">
+                <div class="svg-container">
+                    <svg class="progress-ring">
+                        <circle class="progress-ring-circle" r="58" cx="75" cy="75" />
+                        <circle class="progress-ring-circle" r="58" cx="75" cy="75" />
+                    </svg>
+                </div>
+                <div class="progress-text">
+                   <span id="number" class="number"> </span><span class="percent">%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    var targetContainer = document.getElementById("number");
+    const circle = document.querySelector('.progress-ring circle:nth-child(2)');
+    const radius = circle.r.baseVal.value;
+    const circumference = radius * 2 * Math.PI;
+    circle.style.strokeDasharray = `${circumference} ${circumference}`;   
+
+    function setProgress(percent) {
+        targetContainer.innerHTML = percent;
+        const offset = circumference - percent / 100 * circumference;
+        circle.style.strokeDashoffset = offset;
+    }
+
+    var eventSource = new EventSource("{{ url_for('views.stream') }}");
+    eventSource.addEventListener('progress', function (event)
+        {
+            setProgress(event.data);
+        }
+    )
+
+    eventSource.addEventListener('redirect', function (event)
+        {
+            eventSource.close()
+            window.location.href = "{{ url_for('views.results') }}";
+        }
+    )
+</script>
+
+{% endblock content %}
+

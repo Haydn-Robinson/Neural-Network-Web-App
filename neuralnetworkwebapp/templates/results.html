@@ -1,0 +1,23 @@
+{% extends 'layout.html' %}
+{% block content %}
+<div class="wrapper">
+    <div class="main-title-container">
+        <h1>{{ title }}</h1>
+    </div>
+    <div>
+        <button>Download Training Summary</button>
+    </div>
+</div>
+
+<script>
+    const button = document.querySelector('button');
+
+    function download() {
+        window.location.href = "{{ url_for('views.get_training_summary') }}";
+    }
+
+    button.addEventListener('click', download);
+
+</script>
+
+    {% endblock content %}

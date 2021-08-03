@@ -1,0 +1,52 @@
+*, 
+::before,
+*::after {
+    box-sizing: border-box;
+}
+
+
+body {
+    margin: 0;
+    padding: 0;
+    background: white;
+    font-family: 'Roboto', sans-serif;
+    font-size: 75%;
+    height: 200vh;
+}
+
+main {
+    margin: 60px 0px;
+}
+
+.main-title-container {
+    padding: 0 1em;
+}
+
+h2, h3 {
+    padding-top: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+@media screen and (min-width: 1000px) {
+    .main-title-container {
+        padding: 0 2em;
+    }
+}
+
+.wrapper {
+    padding: 1rem 1rem;
+}
+
+
+.container {
+    display: flex;
+    flex-direction: column;
+}
+
+
+
+.container > div,
+.container > form > div {
+    padding: 0.5em 0 2em 0;
+}
