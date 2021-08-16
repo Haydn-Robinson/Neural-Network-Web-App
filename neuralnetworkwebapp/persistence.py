@@ -1,22 +1,8 @@
-from multiprocessing.managers import BaseManager, BaseProxy, DictProxy, NamespaceProxy
-import types
+from multiprocessing.managers import BaseManager, DictProxy
 from .api import TrainNetwork
 
 class StateManager(BaseManager):
     pass
-
-class TrainNetworkProxy(NamespaceProxy):
-
-    _exposed_ = tuple(dir(TrainNetwork))
-
-    def __getattr__(self, key):
-        result = super().__getattr__(key)
-        if isinstance(result, types.MethodType):
-            def wrapper(*args, **kwargs):
-                return self._callmethod(name, args, kwargs)
-            return wrapper
-        return result
-
 
 shared_dict = {}
 train_network_task = TrainNetwork()

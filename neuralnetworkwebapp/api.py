@@ -6,11 +6,11 @@ from functools import wraps
 import io
 import sys
 import matplotlib.pyplot as plt
-from machinelearningpython.neuralnetwork.network import Network
-from machinelearningpython.neuralnetwork.modelselection import hyperparameter_search, _generate_search_cases
-from machinelearningpython.utilities.preprocessing import dataframe_to_inputs_targets, normalise_data, principle_components_analysis, data_preprocessing
-from machinelearningpython.utilities.split import stratified_split
-from machinelearningpython.evaluate import classifier as evcls
+from hrpyml.neuralnetwork.network import Network
+from hrpyml.neuralnetwork.modelselection import hyperparameter_search, _generate_search_cases
+from hrpyml.utilities.preprocessing import dataframe_to_inputs_targets, normalise_data, principle_components_analysis, data_preprocessing
+from hrpyml.utilities.split import stratified_split
+from hrpyml.evaluate import classifier as evcls
 
 
 def capture_print(func):
@@ -28,21 +28,15 @@ class MachineLearningTask:
     def __init__(self):
 
         self.DATA_SET_OUTPUT_FUNCTION = {'skl_moons': 'sigmoid',
-                                         'titanic': 'sigmoid',
                                          'pima_indians_diabetes': 'sigmoid',
-                                         'cifar10': 'softmax'
                                          }
 
         self.DATA_SET_INPUT_OUTPUT_COUNT = {'skl_moons': (2,1),
-                                            'titanic': (2,1),
                                             'pima_indians_diabetes': (8,1),
-                                            'cifar10': (100,10)
                                             }
 
         self.DATA_SET_TEST_PROPORTION = {'skl_moons': 0.5,
-                                         'titanic': 0.2,
                                          'pima_indians_diabetes': 0.2,
-                                         'cifar10': 0.2
                                          }
 
 
@@ -160,6 +154,18 @@ class TrainNetwork(MachineLearningTask):
     def get_search_case_count(self):
         return self.search_case_count
 
+    def get_test_model_outputs(self):
+        return self.test_model_outputs
+
+    def get_roc_curve(self):
+        return self.roc_curve
+
+    def get_auroc(self):
+        return self.auroc
+
+    def get_training_failed(self):
+        return self.training_failed
+
     @capture_print
     def run(self):
         """ Train network """
@@ -188,12 +194,15 @@ class TrainNetwork(MachineLearningTask):
 
 
         # Evaluate
-        test_model_outputs = self.network.feedforward(preprocessed_test_inputs)
-        tprs, fprs, accuracies, thresholds = evcls.roc_curve(test_model_outputs, self.targets[test_indicies, ...], plot=False)
-        auroc = evcls.auroc(test_model_outputs, self.targets[test_indicies, ...])
-        print(f'\nAUROC: {auroc}\n')
-        threshold, tpr, fpr, accuracy = evcls.choose_threshold(tprs, fprs, accuracies, thresholds)
+        self.test_model_outputs = self.network.feedforward(preprocessed_test_inputs)
+        self.roc_curve = evcls.binary_roc_curve(self.test_model_outputs, self.targets[test_indicies, ...])
+        self.auroc = evcls.binary_auroc(self.test_model_outputs, self.targets[test_indicies, ...])
+        if self.auroc <= 0.5:
+            self.training_failed = True
+        else:
+            self.training_failed = False
+        print(f'\nAUROC: {self.auroc}\n')
+        threshold, tpr, fpr, accuracy = evcls.choose_threshold(**self.roc_curve)
         print(f'\nmax accuracy:\t{accuracy}\ntpr:\t{tpr}\nfpr:\t{fpr}\nthreshold:\t{threshold}\n\n')
-        #plt.show()
 
         self.complete = True

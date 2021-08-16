@@ -2,18 +2,14 @@
 Routes and views for the flask application.
 """
 
-from flask import Blueprint, render_template, request, redirect, url_for, session, Response, current_app, send_file
-from jinja2 import Environment, FileSystemLoader
+from flask import Blueprint, render_template, request, redirect, url_for, session, Response, current_app, send_file, jsonify
 import numpy as np
 from pathlib import Path
 from threading import Thread
-#from multiprocessing import Lock
-#from multiprocessing.managers import BaseManager, DictProxy, AquirerProxy
 import re
 from time import sleep
 from .persistence import get_manager
 from .api import MachineLearningTask, TrainNetwork
-import pickle
 
 blueprint = Blueprint('views', __name__)
 
@@ -38,6 +34,7 @@ def async_train_network(train_network_task, root_path):
     thread.start()
     return thread
 
+
 def compute_progress(max_combinations, max_folds, max_epochs, combination, fold, epoch, search_done_flag, message):
     combination_matches = re.findall(r'Combination: [0-9]+', message)
     fold_matches = re.findall(r'fold [0-9]+', message)
@@ -45,18 +42,23 @@ def compute_progress(max_combinations, max_folds, max_epochs, combination, fold,
 
     if len(combination_matches) > 0:
         combination = int(combination_matches[-1].split(' ')[-1])
+        fold = 1
+        epoch = 0
     if len(fold_matches) > 0:
         fold = int(fold_matches[-1].split(' ')[-1])
+        epoch = 0
     if len(epoch_matches) > 0:
         epoch = int(epoch_matches[-1].split(' ')[-1])
 
-    total_percent = 100 * (((combination-1)*max_folds*max_epochs +(fold-1)*max_epochs + epoch + max_epochs*int(search_done_flag)*int(max_combinations>1))
+    total_percent = 100 * (((combination-1)*max_folds*max_epochs + (fold-1)*max_epochs + epoch + max_epochs*int(search_done_flag)*int(max_combinations>1))
                      / (max_combinations*max_folds*max_epochs + max_epochs*int(max_combinations>1)))
 
-    if combination == max_combinations or fold == max_folds or epoch == max_epochs:
+    if combination == max_combinations and fold == max_folds and epoch == max_epochs:
         search_done_flag = True
+        epoch = 0
 
     return round(total_percent), combination, fold, epoch, search_done_flag
+
 
 @blueprint.route('/')
 @blueprint.route('/about')
@@ -185,12 +187,12 @@ def stream():
     return Response(epoch_stream(train_network_task), mimetype='text/event-stream')
     
 
-
 @blueprint.route('/network-widget/results')
 def results():
     """Renders the network training results page."""
 
     return render_template("results.html", title="Results")
+
 
 @blueprint.route('/network-widget/results/download')
 def get_training_summary():
@@ -200,6 +202,13 @@ def get_training_summary():
                      as_attachment=True)
 
 
+@blueprint.route('/network-widget/results/get_results')
+def get_results():
+    manager = get_manager(current_app)
+    train_network_task = manager.TrainNetwork()
+
+    response = {'auroc': train_network_task.get_auroc(), 'training_failed': train_network_task.get_training_failed()}
+    return jsonify(response)
 
 
 
