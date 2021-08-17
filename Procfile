@@ -1,2 +1,2 @@
 worker: python server.py
-web: python neuralnetworkwebapp.py
+web: gunicorn 'neuralnetworkwebapp:create_app()'
