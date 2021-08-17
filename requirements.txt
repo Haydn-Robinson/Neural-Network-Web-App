@@ -1,4 +1,4 @@
 Flask>=2.0.1
 pandas>=1.2.4
 numpy>=1.20.2
-git+ssh://github.com/Haydn-Robinson/Python-Machine-Learning.git#egg=hr-pyml
+git+https://github.com/Haydn-Robinson/Python-Machine-Learning.git#egg=hr-pyml
