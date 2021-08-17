@@ -27,6 +27,15 @@ class MachineLearningTask:
 
     def __init__(self):
 
+        self.DATA_URL = {'skl_moons': ('https://gist.githubusercontent.com/Haydn-Robinson/'
+                                       'e1e724ea6afa4a8c02959bbfcaf59ade/raw/'
+                                       'bd7d1523a9823afc61c1aa730b70c5219a738808/skl_moons.csv'),
+
+                         'pima_indians_diabetes': ('https://gist.githubusercontent.com/Haydn-Robinson/'
+                                                   'a63cec7aadd91feb265b99c7b3fc02ed/raw/'
+                                                   '6b2fa370a419a6be9184bebd5ba6dd23fd23705a/pima_indians_diabetes.csv'),
+                        }
+
         self.DATA_SET_OUTPUT_FUNCTION = {'skl_moons': 'sigmoid',
                                          'pima_indians_diabetes': 'sigmoid',
                                          }
@@ -47,8 +56,7 @@ class MachineLearningTask:
 
     def _get_data(self, data_id, root_path):
         """ Load the dataset specified in the supplied flask request object from file """
-        path = Path(root_path + f'\static\datasets\{data_id}.csv')
-        dataframe = pd.read_csv(path)
+        dataframe = pd.read_csv(self.DATA_URL[data_id])
         inputs, targets = dataframe_to_inputs_targets(dataframe, *self.DATA_SET_INPUT_OUTPUT_COUNT[data_id])
         return inputs, targets
 
