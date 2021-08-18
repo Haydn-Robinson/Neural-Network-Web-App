@@ -12,7 +12,7 @@ def create_app():
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
     app.config['MANAGER_AUTHKEY'] = bytes(os.environ.get('MANAGER_AUTHKEY'), 'utf8')
 
-    app.config['MANAGER_HOST'] = ''
+    app.config['MANAGER_HOST'] = '0.0.0.0'
     #'neural-network-web-app.herokuapp.com'
     app.config['MANAGER_PORT'] = 22109
 
