@@ -12,5 +12,6 @@ if __name__ == '__main__':
     MANAGER_PORT = 22109
 
     MANAGER_AUTHKEY = bytes(os.environ.get('MANAGER_AUTHKEY'), 'utf8')
+    print(f"port: {os.environ.get('PORT')}")
 
     init_manager(MANAGER_HOST, MANAGER_PORT, MANAGER_AUTHKEY)
