@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>34dc1227-603a-43e7-ad44-10e19fdab313</ProjectGuid>
+    <ProjectHome>.</ProjectHome>
+    <ProjectTypeGuids>{789894c7-04a9-4a11-a6b5-3f4435165112};{1b580a1a-fdb3-4b32-83e1-6407eb2722e6};{349c5851-65df-11da-9384-00065b846f21};{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
+    <StartupFile>rundevelopmentserver.py</StartupFile>
+    <SearchPath>
+    </SearchPath>
+    <WorkingDirectory>.</WorkingDirectory>
+    <LaunchProvider>Web launcher</LaunchProvider>
+    <WebBrowserUrl>http://localhost</WebBrowserUrl>
+    <OutputPath>.</OutputPath>
+    <SuppressCollectPythonCloudServiceFiles>true</SuppressCollectPythonCloudServiceFiles>
+    <Name>neuralnetworkwebapp</Name>
+    <RootNamespace>neuralnetworkwebapp</RootNamespace>
+    <InterpreterId>MSBuild|env|D:\Repos\machinelearningpython\machinelearningpython\machinelearningpython.pyproj</InterpreterId>
+    <SuppressEnvironmentCreationPrompt>True</SuppressEnvironmentCreationPrompt>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="rundevelopmentserver.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="neuralnetworkwebapp\api.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="neuralnetworkwebapp\persistence.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="neuralnetworkwebapp\__init__.py" />
+    <Compile Include="neuralnetworkwebapp\views.py" />
+    <Compile Include="runmanager.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="runproductionserver.py">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="neuralnetworkwebapp\" />
+    <Folder Include="neuralnetworkwebapp\static\" />
+    <Folder Include="neuralnetworkwebapp\static\content\" />
+    <Folder Include="neuralnetworkwebapp\static\datasets\" />
+    <Folder Include="neuralnetworkwebapp\static\scripts\" />
+    <Folder Include="neuralnetworkwebapp\templates\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="LICENSE.txt" />
+    <Content Include="neuralnetworkwebapp\static\content\general_styles.css" />
+    <Content Include="neuralnetworkwebapp\static\content\nav_bar_styles.css" />
+    <Content Include="neuralnetworkwebapp\static\content\network_results_styles.css" />
+    <Content Include="neuralnetworkwebapp\static\content\setup_network_styles.css" />
+    <Content Include="neuralnetworkwebapp\static\content\train_network_styles.css" />
+    <Content Include="neuralnetworkwebapp\static\scripts\loadDefaults.js" />
+    <Content Include="neuralnetworkwebapp\templates\results.html" />
+    <Content Include="neuralnetworkwebapp\templates\setup_network.html" />
+    <Content Include="neuralnetworkwebapp\templates\examples.html" />
+    <Content Include="neuralnetworkwebapp\templates\about.html" />
+    <Content Include="neuralnetworkwebapp\templates\layout.html" />
+    <Content Include="neuralnetworkwebapp\templates\train_network.html" />
+    <Content Include="Procfile" />
+    <Content Include="Procfile_local" />
+    <Content Include="README.md" />
+    <Content Include="requirements.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <InterpreterReference Include="MSBuild|env|D:\Repos\machinelearningpython\machinelearningpython\machinelearningpython.pyproj" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.Web.targets" />
+  <!-- Specify pre- and post-build commands in the BeforeBuild and 
+       AfterBuild targets below. -->
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <AutoAssignPort>True</AutoAssignPort>
+          <UseCustomServer>True</UseCustomServer>
+          <CustomServerUrl>http://localhost</CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}" User="">
+        <WebProjectProperties>
+          <StartPageUrl>
+          </StartPageUrl>
+          <StartAction>CurrentPage</StartAction>
+          <AspNetDebugging>True</AspNetDebugging>
+          <SilverlightDebugging>False</SilverlightDebugging>
+          <NativeDebugging>False</NativeDebugging>
+          <SQLDebugging>False</SQLDebugging>
+          <ExternalProgram>
+          </ExternalProgram>
+          <StartExternalURL>
+          </StartExternalURL>
+          <StartCmdLineArguments>
+          </StartCmdLineArguments>
+          <StartWorkingDirectory>
+          </StartWorkingDirectory>
+          <EnableENC>False</EnableENC>
+          <AlwaysStartWebServerOnDebug>False</AlwaysStartWebServerOnDebug>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>
