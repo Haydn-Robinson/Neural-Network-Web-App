@@ -8,4 +8,4 @@ if __name__ == '__main__':
     load_dotenv(dotenv_path)
 
     app = create_app()
-    app.run()
+    app.run(debug=True)

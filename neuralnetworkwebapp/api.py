@@ -1,16 +1,16 @@
 import numpy as np
 import pandas as pd
-from pathlib import Path
-import csv
 from functools import wraps
 import io
 import sys
-import matplotlib.pyplot as plt
+import re
 from hrpyml.neuralnetwork.network import Network
 from hrpyml.neuralnetwork.modelselection import hyperparameter_search, _generate_search_cases
-from hrpyml.utilities.preprocessing import dataframe_to_inputs_targets, normalise_data, principle_components_analysis, data_preprocessing
+from hrpyml.utilities.preprocessing import dataframe_to_inputs_targets, data_preprocessing
 from hrpyml.utilities.split import stratified_split
 from hrpyml.evaluate import classifier as evcls
+from threading import Thread, Event
+from rq import get_current_job
 
 
 def capture_print(func):
@@ -23,9 +23,34 @@ def capture_print(func):
     return with_print_capture
 
 
+def compute_progress(max_combinations, max_folds, max_epochs, combination, fold, epoch, search_done_flag, message):
+    combination_matches = re.findall(r'Combination: [0-9]+', message)
+    fold_matches = re.findall(r'fold [0-9]+', message)
+    epoch_matches = re.findall(r'Epoch: +[0-9]+', message)
+
+    if len(combination_matches) > 0:
+        combination = int(combination_matches[-1].split(' ')[-1])
+        fold = 1
+        epoch = 0
+    if len(fold_matches) > 0:
+        fold = int(fold_matches[-1].split(' ')[-1])
+        epoch = 0
+    if len(epoch_matches) > 0:
+        epoch = int(epoch_matches[-1].split(' ')[-1])
+
+    total_percent = 100 * (((combination-1)*max_folds*max_epochs + (fold-1)*max_epochs + epoch + max_epochs*int(search_done_flag)*int(max_combinations>1))
+                     / (max_combinations*max_folds*max_epochs + max_epochs*int(max_combinations>1)))
+
+    if combination == max_combinations and fold == max_folds and epoch == max_epochs:
+        search_done_flag = True
+        epoch = 0
+
+    return round(total_percent), combination, fold, epoch, search_done_flag
+
+
 class MachineLearningTask:
 
-    def __init__(self):
+    def __init__(self, request):
 
         self.DATA_URL = {'skl_moons': ('https://gist.githubusercontent.com/Haydn-Robinson/'
                                        'e1e724ea6afa4a8c02959bbfcaf59ade/raw/'
@@ -48,13 +73,11 @@ class MachineLearningTask:
                                          'pima_indians_diabetes': 0.2,
                                          }
 
-
-    def initialise(self, request, root_path):
         self.dataset_id = request['dataset'][0]
-        self.inputs, self.targets = self._get_data(request['dataset'][0], root_path)
+        self.inputs, self.targets = self._get_data(request['dataset'][0])
 
 
-    def _get_data(self, data_id, root_path):
+    def _get_data(self, data_id):
         """ Load the dataset specified in the supplied flask request object from file """
         dataframe = pd.read_csv(self.DATA_URL[data_id])
         inputs, targets = dataframe_to_inputs_targets(dataframe, *self.DATA_SET_INPUT_OUTPUT_COUNT[data_id])
@@ -63,17 +86,14 @@ class MachineLearningTask:
 
 class TrainNetwork(MachineLearningTask):
 
-    def __init__(self):
-        super().__init__()
-
-
-    def initialise(self, request, root_path):
-        super().initialise(request, root_path)
+    def __init__(self, request):
+        super().__init__(request)
         self.BUFFER = io.StringIO()
         self.complete = False
         self.network_parameters = self._get_network_parameters(request)
         self.training_parameters = self._get_training_parameters(request)
         self.optimiser_parameters = self._get_optimiser_parameters(request)
+        self.search_case_count = len(_generate_search_cases(self.network_parameters, self.training_parameters))
 
 
     def _get_network_parameters(self, request):
@@ -94,9 +114,6 @@ class TrainNetwork(MachineLearningTask):
 
     def _get_training_parameters(self, request):
         """" Process flask request object and produce training parameter dictionary"""
-
-        # Process flask request object
-        dataset=request['dataset'][0]
 
         data_preprocessors = []
         if 'normalise' in request:
@@ -141,38 +158,6 @@ class TrainNetwork(MachineLearningTask):
                 'learning_rate_decay_rate': 5
                 }
 
-    def get_buffer(self):
-        return self.BUFFER
-
-    def get_complete(self):
-        return self.complete
-
-    def get_search(self):
-        return self.search
-
-    def get_network_parameters(self):
-        return self.network_parameters
-
-    def get_training_parameters(self):
-        return self.training_parameters
-
-    def get_optimiser_parameters(self):
-        return self.optimiser_parameters
-
-    def get_search_case_count(self):
-        return self.search_case_count
-
-    def get_test_model_outputs(self):
-        return self.test_model_outputs
-
-    def get_roc_curve(self):
-        return self.roc_curve
-
-    def get_auroc(self):
-        return self.auroc
-
-    def get_training_failed(self):
-        return self.training_failed
 
     @capture_print
     def run(self):
@@ -187,13 +172,11 @@ class TrainNetwork(MachineLearningTask):
                                                                                                                self.training_parameters['data_preprocessors'])
         # Train Network
         if not self.search:
-            self.search_case_count = 1
             self.network = Network(**self.network_parameters)
             self.network.train(preprocessed_training_inputs, self.targets[training_indicies, ...], self.training_parameters, self.optimiser_parameters)
         
         # Train Network with hyperparameter optimisation
         else:
-            self.search_case_count = len(_generate_search_cases(self.network_parameters, self.training_parameters))
             scores, combinations = hyperparameter_search(self.inputs[training_indicies, ...], self.targets[training_indicies, ...], self.network_parameters, self.training_parameters, self.optimiser_parameters)
             best_combination = combinations[0]
             self.training_parameters['l2_param'] = best_combination['l2_param']
@@ -214,3 +197,47 @@ class TrainNetwork(MachineLearningTask):
         print(f'\nmax accuracy:\t{accuracy}\ntpr:\t{tpr}\nfpr:\t{fpr}\nthreshold:\t{threshold}\n\n')
 
         self.complete = True
+
+
+def monitor_progress(train_network_task, rq_job):
+
+    # Identify maximum values for combination, fold and epoch
+    if train_network_task.search:
+        max_combinations = train_network_task.search_case_count
+        max_folds = train_network_task.training_parameters['fold_count']
+        max_epochs = train_network_task.optimiser_parameters['epochs']
+    else:
+        max_combinations = 1
+        max_folds = 1
+        max_epochs = train_network_task.optimiser_parameters['epochs']
+
+    # initialise counters
+    prev_length = 0
+    combination, fold, epoch = 1, 1, 0
+    search_done_flag = False
+
+    while not train_network_task.complete:
+        Event().wait(0.1)
+        message = train_network_task.BUFFER.getvalue()
+        if len(message) > prev_length:
+            total_percent, combination, fold, epoch, search_done_flag = compute_progress(max_combinations, max_folds, max_epochs,
+                                                                                        combination, fold, epoch, search_done_flag, message[prev_length:])
+            prev_length = len(message)
+            rq_job.meta['progress'] = total_percent
+            rq_job.save_meta()
+
+
+def do_network_training(request_dict):
+    job = get_current_job()
+    train_network_task = TrainNetwork(request_dict)
+    monitor_thread = Thread(target=monitor_progress, args=[train_network_task, job])
+    monitor_thread.start()
+    train_network_task.run()
+    monitor_thread.join()
+    job.meta['auroc'] = train_network_task.auroc
+    job.meta['training_failed'] = train_network_task.training_failed
+    job.meta['print_output'] = train_network_task.BUFFER.getvalue()
+    job.save_meta()
+
+
+

@@ -70,7 +70,6 @@
     <Content Include="neuralnetworkwebapp\templates\layout.html" />
     <Content Include="neuralnetworkwebapp\templates\train_network.html" />
     <Content Include="Procfile" />
-    <Content Include="Procfile_local" />
     <Content Include="README.md" />
     <Content Include="requirements.txt" />
   </ItemGroup>
