@@ -18,7 +18,6 @@ blueprint = Blueprint('views', __name__)
 def get_output(inputs):
     return np.array_str(inputs[1,:])
 
-@blueprint.route('/')
 @blueprint.route('/about')
 def about():
     """Renders the home/about page."""
@@ -30,7 +29,7 @@ def examples():
     """Renders the examples page."""
     return render_template("examples.html", title='Examples')
 
-
+@blueprint.route('/')
 @blueprint.route('/network-widget', methods=['GET', 'POST'])
 def network_setup():
     """Renders the network training setup page."""
