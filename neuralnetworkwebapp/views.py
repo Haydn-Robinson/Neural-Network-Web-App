@@ -29,7 +29,7 @@ def examples():
     """Renders the examples page."""
     return render_template("examples.html", title='Examples')
 
-@blueprint.route('/')
+@blueprint.route('/', methods=['GET', 'POST'])
 @blueprint.route('/network-widget', methods=['GET', 'POST'])
 def network_setup():
     """Renders the network training setup page."""
