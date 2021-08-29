@@ -8,7 +8,7 @@ from pathlib import Path
 from time import sleep
 import os
 import redis
-from rq import Queue
+from rq import Queue, Connection
 from rq.job import Job
 from .api import MachineLearningTask, do_network_training
 
@@ -91,11 +91,11 @@ def train_network():
             request_dict = request.args.to_dict(False)
 
             redis_url = os.getenv('REDISTOGO_URL', 'redis://localhost:6379')
-            redis_client = redis.from_url(redis_url)
 
-            q = Queue(connection=redis_client)
-            job = q.enqueue(do_network_training, request_dict)
-            session['job_id'] = job.id
+            with Connection(redis.from_url(redis_url)):
+                q = Queue()
+                job = q.enqueue(do_network_training, request_dict)
+                session['job_id'] = job.id
 
             return render_template("train_network.html", title='Train Network')
         else:
@@ -105,8 +105,8 @@ def train_network():
 @blueprint.route('/stream', methods=['GET', 'POST'])
 def stream():
     redis_url = os.getenv('REDISTOGO_URL', 'redis://localhost:6379')
-    redis_client = redis.from_url(redis_url)
-    job = Job.fetch(session['job_id'], connection=redis_client)
+    with Connection(redis.from_url(redis_url)):
+        job = Job.fetch(session['job_id'])
 
     def progress_stream(job):
         complete = False
@@ -120,14 +120,14 @@ def stream():
             else:
                 progress = 0
 
+            if job.is_finished:
+                complete = True
+                sleep(0.1)
+
             if not complete:
                 event = 'progress'
             else:
                 event = 'redirect'
-
-            if job.is_finished:
-                complete = True
-                sleep(0.1)
 
             yield f"event:{event}\ndata:{progress}\n\n"
     
@@ -138,8 +138,8 @@ def stream():
 def results():
     """Renders the network training results page."""
     redis_url = os.getenv('REDISTOGO_URL', 'redis://localhost:6379')
-    redis_client = redis.from_url(redis_url)
-    job = Job.fetch(session['job_id'], connection=redis_client)
+    with Connection(redis.from_url(redis_url)):
+        job = Job.fetch(session['job_id'])
     path = Path(current_app.root_path + f'/static/dump.txt')
     dump_file = open(path, 'w')
     dump_file.write(job.meta['print_output'])
@@ -159,8 +159,8 @@ def get_training_summary():
 @blueprint.route('/network-widget/results/get_results')
 def get_results():
     redis_url = os.getenv('REDISTOGO_URL', 'redis://localhost:6379')
-    redis_client = redis.from_url(redis_url)
-    job = Job.fetch(session['job_id'], connection=redis_client)
+    with Connection(redis.from_url(redis_url)):
+        job = Job.fetch(session['job_id'])
     response = {'auroc': job.meta['auroc'], 'training_failed': job.meta['training_failed']}
     return jsonify(response)
 
