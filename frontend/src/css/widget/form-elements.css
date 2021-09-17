@@ -1,0 +1,51 @@
+/* Button styles*/
+.btn {
+  display: inline-block;
+  border: none;
+  padding: 10px 20px;
+  margin: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 15px;
+}
+
+.btn:focus {
+  outline: none;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+
+.collapse {
+  display: block;
+  border: none;
+  padding: 10px 20px;
+  margin: .5em 0;
+  border-radius: 5px;
+  cursor: pointer;
+  text-decoration: none;
+  text-align: left;
+  width: 100%;
+}
+
+.collapse:focus {
+  outline: none;
+}
+
+.collapse span {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.collapse h3 {
+  margin: 0;
+}
+
+.checkbox-list input {
+  margin-right: .5em;
+}
+

@@ -1,0 +1,10 @@
+[
+  {
+    "id": "sklmoons",
+    "name": "Scikit-learn Moons"
+  },
+  {
+    "id": "pima",
+    "name": "Diabetes in Pima Indians"
+  }
+]

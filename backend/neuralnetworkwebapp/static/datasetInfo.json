@@ -1,0 +1,56 @@
+{
+  "sklmoons": {
+    "name": "Scikit-learn Moons",
+    "url": "https://gist.githubusercontent.com/Haydn-Robinson/e1e724ea6afa4a8c02959bbfcaf59ade/raw/bd7d1523a9823afc61c1aa730b70c5219a738808/skl_moons.csv",
+    "description": "A simple 2-dimensional binary classification dataset generated with sklearn.datsets.make_moons(). The points of the two classes form two interleaving half circles.",
+    "variables": [
+      "Position in the x-dimension (no units).",
+      "Position in the y-dimension (no units)."
+    ],
+    "visualisation": true,
+    "options":{
+      "normalise": false,
+      "usePCA": false,
+      "activationFunc": "relu",
+      "hiddenLayers": [16, 8, 4, 2],
+      "searchL2Param": false,
+      "foldCount": 5,
+      "l2Param": 0.8,
+      "optimiser": "nag",
+      "miniBatchSize": 100,
+      "epochs": 30000,
+      "learningRate": 0.005,
+      "momentumParam": 0.9
+    }
+  },
+  "pima": {
+    "name": "Diabetes in Pima Indians",
+    "url": "https://gist.githubusercontent.com/Haydn-Robinson/a63cec7aadd91feb265b99c7b3fc02ed/raw/6b2fa370a419a6be9184bebd5ba6dd23fd23705a/pima_indians_diabetes.csv",
+    "description": "Dataset for investigating the presence of diabetes in females of Pima Indian heritage and of at least 21 years of age.",
+    "variables": [
+      "Number of times pregnant.",
+      "Plasma glucose concentration after 2 hours in an oral glucose tolerance test.",
+      "Diastolic blood pressure (mm Hg).",
+      "Triceps skin fold thickness (mm).",
+      "2-Hour serum insulin (mu U/ml).",
+      "Body mass index (weight in kg/(height in m)^2).",
+      "Diabetes pedigree function.",
+      "Age (years)."
+    ],
+    "visualisation": false,
+    "options":{
+      "normalise": true,
+      "usePCA": true,
+      "activationFunc": "relu",
+      "hiddenLayers": [100],
+      "searchL2Param": true,
+      "foldCount": 5,
+      "l2Param": 1,
+      "optimiser": "nag",
+      "miniBatchSize": 30,
+      "epochs": 100,
+      "learningRate": 0.001,
+      "momentumParam": 0.9
+    }
+  }
+}
