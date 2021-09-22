@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import Button from "./Button"
+import Button from "../common/Button"
 
 function NetworkOptions({activationFunc, setActivationFunc, hiddenLayers, setHiddenLayers}) {
 
@@ -50,9 +49,8 @@ function NetworkOptions({activationFunc, setActivationFunc, hiddenLayers, setHid
       <div>
         <p>No. hidden layers: {hiddenLayers.length}</p>
         {hiddenLayers.map((neuronCount, index) => (
-          <div>
+          <div key={index}>
             <input
-              key={index}
               id={index}
               type="number"
               min="1"

@@ -1,11 +1,12 @@
-import '../../css/widget/base.css';
+import '../../css/widget/setup.css';
 import '../../css/widget/form-elements.css';
-import SetupTraining from '../neural-network-widget/SetupTraining.js'
+import '../../css/widget/progress.css';
+import Widget from '../neural-network-widget/Widget'
 
 function TrainNetwork() {
   return (
       <div className='container'>
-          <SetupTraining/>
+          <Widget/>
       </div>
   )
 }

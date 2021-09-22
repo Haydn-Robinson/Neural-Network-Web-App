@@ -1,0 +1,48 @@
+.progress {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+}
+
+
+.progress-ring {
+  position: relative;
+}
+
+.svg-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.progress-ring svg {
+  position: relative;
+}
+
+.progress-ring svg circle:first-child {
+  fill: none;
+  stroke: rgba(49, 49, 49, 0.171);
+  stroke-linecap: round;
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+}
+
+.progress-ring circle:nth-child(2) {
+  fill: none;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.35s;
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+}
+
+.progress-ring div:nth-of-type(2) {
+  font-size: 2em;
+  font-weight: bold;
+  padding: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}

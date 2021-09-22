@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { AiOutlineQuestionCircle } from 'react-icons/ai'
-import AlgorithmToolTip from './AlgorithmToolTip'
+import AlgorithmToolTip from './AlgorithmTooltip'
 
 function TrainingParameterOptions({
   l2Param, setL2Param, optimiser, setOptimiser,

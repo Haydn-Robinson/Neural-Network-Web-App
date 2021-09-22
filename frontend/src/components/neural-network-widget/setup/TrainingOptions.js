@@ -1,12 +1,12 @@
 import { useState } from 'react'
-import NetworkOptions from "./NetworkOptions"
-import CollapseSection from "./CollapseSection"
+import CollapseSection from "../common/CollapseSection"
 import DataPreprocessing from "./DataPreprocessing"
+import NetworkOptions from "./NetworkOptions"
 import HyperparametersearchOptions from "./HyperparametersearchOptions"
 import TrainingParameterOptions from "./TrainingParameterOptions"
-import Button from "./Button"
+import Button from "../common/Button"
 
-function TrainingOptions({datasetSelected, datasetInfo}) {
+function TrainingOptions({datasetSelected, datasetInfo, setTaskState}) {
   // Collapsibles state
   const [showPreprocessing, setShowPreprocessing] = useState(false)
   const [showNetOpts, setShowNetOpts] = useState(false)
@@ -41,10 +41,16 @@ function TrainingOptions({datasetSelected, datasetInfo}) {
     setEpochs(optionsToLoad.epochs)
     setLearningRate(optionsToLoad.learningRate)
     setMomentumParam(optionsToLoad.momentumParam)
+
+    setShowPreprocessing(true)
+    setShowNetOpts(true)
+    setShowHypSearch(true)
+    setShowTrainParams(true)
   }
 
   const makeParamsObject = () => {
     const params = {
+      "datasetID": datasetInfo.id,
       "normalise": normalise,
       "usePCA": usePCA,
       "activationFunc": activationFunc,
@@ -63,14 +69,14 @@ function TrainingOptions({datasetSelected, datasetInfo}) {
 
   const trainNetwork = async () => {
     const params = makeParamsObject()
-    const res = await fetch(`api/trainnetwork`, {
+    await fetch(`api/trainnetwork`, {
       method: 'POST',
       headers: {
           'Content-type': 'application/json'
       },
       body: JSON.stringify(params)
   })
-    const id = await res.json()
+    setTaskState('PROGRESS')
   }
 
   return (

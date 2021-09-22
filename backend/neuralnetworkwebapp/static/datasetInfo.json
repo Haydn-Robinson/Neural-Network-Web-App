@@ -1,5 +1,6 @@
 {
   "sklmoons": {
+    "id": "sklmoons",
     "name": "Scikit-learn Moons",
     "url": "https://gist.githubusercontent.com/Haydn-Robinson/e1e724ea6afa4a8c02959bbfcaf59ade/raw/bd7d1523a9823afc61c1aa730b70c5219a738808/skl_moons.csv",
     "description": "A simple 2-dimensional binary classification dataset generated with sklearn.datsets.make_moons(). The points of the two classes form two interleaving half circles.",
@@ -21,9 +22,15 @@
       "epochs": 30000,
       "learningRate": 0.005,
       "momentumParam": 0.9
+    },
+    "datasetParams":{
+      "outputFunction": "sigmoid",
+      "inputOutputCount": [2,1],
+      "testProportion": 0.5
     }
   },
   "pima": {
+    "id": "pima",
     "name": "Diabetes in Pima Indians",
     "url": "https://gist.githubusercontent.com/Haydn-Robinson/a63cec7aadd91feb265b99c7b3fc02ed/raw/6b2fa370a419a6be9184bebd5ba6dd23fd23705a/pima_indians_diabetes.csv",
     "description": "Dataset for investigating the presence of diabetes in females of Pima Indian heritage and of at least 21 years of age.",
@@ -51,6 +58,11 @@
       "epochs": 100,
       "learningRate": 0.001,
       "momentumParam": 0.9
+    },
+    "datasetParams":{
+      "outputFunction": "sigmoid",
+      "inputOutputCount": [8,1],
+      "testProportion": 0.2
     }
   }
 }

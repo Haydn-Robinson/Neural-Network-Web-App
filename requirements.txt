@@ -1,9 +1,1 @@
-Flask>=2.0.1
-Flask-Cors>=3.0.10
-numpy>=1.20.2
-pandas>=1.2.4
-python-dotenv>=0.19.0
-redis>=3.5.3
-rq>=1.9.0
-waitress>=2.0.0
-git+https://github.com/Haydn-Robinson/Python-Machine-Learning.git#egg=hr-pyml
+-r requirements/production.txt

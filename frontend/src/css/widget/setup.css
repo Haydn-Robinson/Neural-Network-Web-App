@@ -1,18 +1,5 @@
 
-.widget-header h3 {
-  display: inline;
-}
-
-.container {
-  margin: 30px auto;
-  max-width: 500px;
-  min-height: 300px;
-  border: 1px solid steelblue;
-  padding: 30px;
-  border-radius: 5px;
-}
-
-.widget > div {
+.setup > div {
   margin-bottom: 2em;
 }
 
@@ -95,13 +82,6 @@
 .hyperparam-search > div:nth-of-type(2) input{
   margin-left: .5em;
 }
-
-/* .trainingparam-options > div {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: .25em 0
-} */
 
 .trainingparam-options td {
   padding: .25em 0

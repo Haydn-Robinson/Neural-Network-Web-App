@@ -48,109 +48,76 @@ def compute_progress(max_combinations, max_folds, max_epochs, combination, fold,
     return round(total_percent), combination, fold, epoch, search_done_flag
 
 
-class MachineLearningTask:
+class TrainNetwork():
 
-    def __init__(self, request):
-
-        self.DATA_URL = {'skl_moons': ('https://gist.githubusercontent.com/Haydn-Robinson/'
-                                       'e1e724ea6afa4a8c02959bbfcaf59ade/raw/'
-                                       'bd7d1523a9823afc61c1aa730b70c5219a738808/skl_moons.csv'),
-
-                         'pima_indians_diabetes': ('https://gist.githubusercontent.com/Haydn-Robinson/'
-                                                   'a63cec7aadd91feb265b99c7b3fc02ed/raw/'
-                                                   '6b2fa370a419a6be9184bebd5ba6dd23fd23705a/pima_indians_diabetes.csv'),
-                        }
-
-        self.DATA_SET_OUTPUT_FUNCTION = {'skl_moons': 'sigmoid',
-                                         'pima_indians_diabetes': 'sigmoid',
-                                         }
-
-        self.DATA_SET_INPUT_OUTPUT_COUNT = {'skl_moons': (2,1),
-                                            'pima_indians_diabetes': (8,1),
-                                            }
-
-        self.DATA_SET_TEST_PROPORTION = {'skl_moons': 0.5,
-                                         'pima_indians_diabetes': 0.2,
-                                         }
-
-        self.dataset_id = request['dataset'][0]
-        self.inputs, self.targets = self._get_data(request['dataset'][0])
-
-
-    def _get_data(self, data_id):
-        """ Load the dataset specified in the supplied flask request object from file """
-        dataframe = pd.read_csv(self.DATA_URL[data_id])
-        inputs, targets = dataframe_to_inputs_targets(dataframe, *self.DATA_SET_INPUT_OUTPUT_COUNT[data_id])
-        return inputs, targets
-
-
-class TrainNetwork(MachineLearningTask):
-
-    def __init__(self, request):
-        super().__init__(request)
+    def __init__(self, params, data_url, dataset_params):
+        self.inputs, self.targets = self._get_data(data_url, *dataset_params["inputOutputCount"])
         self.BUFFER = io.StringIO()
         self.complete = False
-        self.network_parameters = self._get_network_parameters(request)
-        self.training_parameters = self._get_training_parameters(request)
-        self.optimiser_parameters = self._get_optimiser_parameters(request)
+        self.network_parameters = self._get_network_parameters(params, dataset_params)
+        self.training_parameters = self._get_training_parameters(params)
+        self.optimiser_parameters = self._get_optimiser_parameters(params)
         self.search_case_count = len(_generate_search_cases(self.network_parameters, self.training_parameters))
+        self.test_prop = dataset_params["testProportion"]
 
+    def _get_data(self, data_url, input_count, output_count):
+        """ Load the dataset at the given url and split into inputs and targets """
+        dataframe = pd.read_csv(data_url)
+        inputs, targets = dataframe_to_inputs_targets(dataframe, input_count, output_count)
+        return inputs, targets
 
-    def _get_network_parameters(self, request):
+    def _get_network_parameters(self, params, dataset_params):
         """" Process flask request object and produce network parameter dictionary"""
 
-        # Process flask request object
-        dataset=request['dataset'][0]
-        neurons = [int(val) for val in request["hidden_layer_neurons"]]
-        neurons.insert(0, self.DATA_SET_INPUT_OUTPUT_COUNT[dataset][0])
-        neurons.append(self.DATA_SET_INPUT_OUTPUT_COUNT[dataset][-1])
+        # Extract parameters
+        neurons = params['hiddenLayers']
+        neurons.insert(0, dataset_params["inputOutputCount"][0])
+        neurons.append(dataset_params["inputOutputCount"][1])
 
         # Build network parameter dictionary
         return {'network_structure': tuple(neurons),
-                'hidden_layer_function': request["activation_function"][0],
-                'output_function': self.DATA_SET_OUTPUT_FUNCTION[dataset]
+                'hidden_layer_function': params["activationFunc"],
+                'output_function': dataset_params["outputFunction"]
                 }
 
-
-    def _get_training_parameters(self, request):
-        """" Process flask request object and produce training parameter dictionary"""
+    def _get_training_parameters(self, params):
+        """" Process params dict passed from frontend and produce training parameter dictionary"""
 
         data_preprocessors = []
-        if 'normalise' in request:
+        if params['normalise']:
             data_preprocessors.append('normalise')
-        if 'pca' in request:
+        if params['usePCA']:
             data_preprocessors.append('pca')
 
-        if request['l2_param'][0] == 'search':
+        if params['searchL2Param']:
             l2_param = np.concatenate((np.array([0]), np.logspace(-5, 2, 8)))
-            fold_count = int(request['fold_count'][0])
+            fold_count = params['foldCount']
             self.search = True
         else:
-            l2_param = float(request['l2_param'][0])
+            l2_param = params['l2Param']
             fold_count = None
             self.search = False
 
         # Build training parameter dictionary
         return {'fold_count': fold_count,
-                'optimiser': request['algorithm'][0],
+                'optimiser': params['optimiser'],
                 'data_preprocessors': data_preprocessors,
                 'l2_param': l2_param
                 }
 
+    def _get_optimiser_parameters(self, params):
+        """" Process params dict passed from frontend and produce optimiser parameter dictionary"""
 
-    def _get_optimiser_parameters(self, request):
-        """" Process flask request object and produce optimiser parameter dictionary"""
-
-        # Process flask request object
-        if request['algorithm'][0] == 'nag':
-            momentum_param = float(request['momentum_param'][0])
+        # Process flask params object
+        if params['optimiser'] == 'nag':
+            momentum_param = params['momentumParam']
         else:
             momentum_param = None
 
         # Build optimiser parameter dictionary
-        return {'mini_batch_size': int(request['mini_batch_size'][0]),
-                'epochs': int(request['epochs'][0]),
-                'learning_rate': float(request['learning_rate'][0]),
+        return {'mini_batch_size': params['miniBatchSize'],
+                'epochs': params['epochs'],
+                'learning_rate': params['learningRate'],
                 'momentum_coefficient': momentum_param,
                 'verbose': True,
                 'learning_rate_decay_factor': 1,
@@ -164,7 +131,7 @@ class TrainNetwork(MachineLearningTask):
         """ Train network """
 
         # Split Data
-        training_indicies, test_indicies = stratified_split(self.targets, self.DATA_SET_TEST_PROPORTION[self.dataset_id])
+        training_indicies, test_indicies = stratified_split(self.targets, self.test_prop)
 
         # Preprocess inputs
         preprocessed_training_inputs, preprocessed_test_inputs, self.preprocessing_params = data_preprocessing(self.inputs[training_indicies, ...],
@@ -227,12 +194,14 @@ def monitor_progress(train_network_task, rq_job):
             rq_job.save_meta()
 
 
-def do_network_training(request_dict):
+def do_network_training(params, dataset_info):
     job = get_current_job()
-    train_network_task = TrainNetwork(request_dict)
+    train_network_task = TrainNetwork(params, dataset_info['url'], dataset_info['datasetParams'])
     monitor_thread = Thread(target=monitor_progress, args=[train_network_task, job])
     monitor_thread.start()
+    print('START')
     train_network_task.run()
+    print('END')
     monitor_thread.join()
     job.meta['auroc'] = train_network_task.auroc
     job.meta['training_failed'] = train_network_task.training_failed

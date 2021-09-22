@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import SelectDataset from './SelectDataset.js'
-import Button from "../Button"
+import Button from "../../common/Button"
 import DatasetInfo from './DatasetInfo.js'
 
 function DatasetOptions({updateDatasetInfo, datasetInfo, datasetSelected}) {

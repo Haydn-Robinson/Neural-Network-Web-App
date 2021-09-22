@@ -9,7 +9,7 @@ body {
   margin: 0;
   padding: 0;
   background: white;
-  height: 200vh;
+  height: 100vh;
 }
 
 main {
@@ -24,6 +24,19 @@ main {
 
 .error-404-page h1, h2 {
   margin: 0;
+}
+
+.widget-header h3 {
+  display: inline;
+}
+
+.widget {
+  margin: 30px auto;
+  max-width: 500px;
+  min-height: 500px;
+  border: 1px solid steelblue;
+  padding: 30px;
+  border-radius: 5px;
 }
 
 
