@@ -1,2 +1,2 @@
-worker: python worker.py
-web: waitress-serve --call --port=$PORT neuralnetworkwebapp:create_app
+worker: python3 ./backend/worker.py
+web: cd ./backend/ && waitress-serve --call --port=$PORT neuralnetworkwebapp:create_app

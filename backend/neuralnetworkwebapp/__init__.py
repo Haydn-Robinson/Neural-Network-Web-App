@@ -14,8 +14,9 @@ def create_app():
     static_url_path="/")
 
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
-    app.config['SESSION_COOKIE_SECURE'] = True
-    app.config['SESSION_COOKIE_SECURE'] = 'Lax'
+    if os.environ.get('HTTPS') == 'True':
+        app.config['SESSION_COOKIE_SECURE'] = True
+        app.config['SESSION_COOKIE_SECURE'] = 'Lax'
     CORS(app)
 
     from . import views
