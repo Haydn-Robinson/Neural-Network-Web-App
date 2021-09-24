@@ -15,7 +15,7 @@ body {
 main {
   margin: 100px 1rem;
   font-family: 'Poppins', sans-serif;
-  font-size: 90%;
+  font-size: 70%;
 }
 
 .error-404-page {
@@ -37,6 +37,14 @@ main {
   border: 1px solid steelblue;
   padding: 30px;
   border-radius: 5px;
+}
+
+@media screen and (min-width: 445px) {
+
+  main {
+    font-size: 90%;
+  }
+
 }
 
 

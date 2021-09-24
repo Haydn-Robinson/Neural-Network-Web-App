@@ -2,12 +2,12 @@
 .btn {
   display: inline-block;
   border: none;
-  padding: 10px 20px;
-  margin: 5px;
+  padding: 7.5px 10px;
+  margin: 5px 10px;
   border-radius: 5px;
   cursor: pointer;
   text-decoration: none;
-  font-size: 15px;
+  font-size: 11px;
 }
 
 .btn:focus {
@@ -42,9 +42,45 @@
 
 .collapse h3 {
   margin: 0;
+  font-size: 1em;
 }
 
 .checkbox-list input {
   margin-right: .5em;
+}
+
+@media screen and (min-width: 410px) {
+
+  .btn {
+    padding: 10px 15px;
+    font-size: 12px;
+  }
+
+  .collapse {
+    padding: 10px 20px;
+  }
+
+  .collapse h3 {
+    font-size: 1em;
+  }
+
+}
+
+@media screen and (min-width: 445px) {
+
+  .btn {
+    padding: 10px 20px;
+    margin: 5px;
+    font-size: 15px;
+  }
+
+  .collapse {
+    padding: 10px 20px;
+  }
+
+  .collapse h3 {
+    font-size: 1.17em;
+  }
+
 }
 

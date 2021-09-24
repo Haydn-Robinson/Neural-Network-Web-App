@@ -2,6 +2,10 @@ import { useState } from 'react'
 import SetupTraining from './setup/SetupTraining'
 import Progress from './Progress'
 import Results from './Results'
+import '../../css/widget/setup.css';
+import '../../css/widget/form-elements.css';
+import '../../css/widget/progress.css';
+import '../../css/widget/results.css';
 
 function Widget() {
   // Dataset state

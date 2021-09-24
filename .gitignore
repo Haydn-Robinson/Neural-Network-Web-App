@@ -22,4 +22,5 @@ __pycache__/
 neuralnetworkwebapp.egg-info/
 node_modules
 
+#Production build
 */build/
