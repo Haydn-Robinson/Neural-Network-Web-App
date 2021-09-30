@@ -8,3 +8,7 @@
 .results p {
   text-align: justify;
 }
+
+.results div {
+  width: 100%;
+}
