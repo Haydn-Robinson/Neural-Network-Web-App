@@ -204,6 +204,7 @@ def do_network_training(params, dataset_info):
     print('END')
     monitor_thread.join()
     job.meta['auroc'] = train_network_task.auroc
+    job.meta['roc_curve'] = train_network_task.roc_curve
     job.meta['training_failed'] = train_network_task.training_failed
     job.meta['print_output'] = train_network_task.BUFFER.getvalue()
     job.save_meta()

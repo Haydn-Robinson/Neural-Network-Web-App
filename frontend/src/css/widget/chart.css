@@ -1,0 +1,18 @@
+.chart {
+  font-size: .6rem;
+	width: 100%;
+
+}
+
+.axes line {
+  stroke: #C0C0BB;
+}
+
+.axes .box {
+  stroke: none;
+  fill: none;
+}
+
+.marks path {
+  stroke: black;
+}

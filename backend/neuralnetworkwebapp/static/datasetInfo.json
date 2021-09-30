@@ -8,7 +8,11 @@
       "Position in the x-dimension (no units).",
       "Position in the y-dimension (no units)."
     ],
+    "varNames": ["input1", "input2"],
     "visualisation": true,
+    "visOptions": {
+      "labels": {"x": "Dimension 1", "y": "Dimension 2"}
+    },
     "options":{
       "normalise": false,
       "usePCA": false,

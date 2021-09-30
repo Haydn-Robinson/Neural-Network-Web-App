@@ -114,5 +114,9 @@ def get_results():
     redis_url = os.getenv('REDISTOGO_URL', 'redis://localhost:6379')
     with Connection(redis.from_url(redis_url)):
         job = Job.fetch(session['job_id'])
-    response = {'auroc': job.meta['auroc'], 'training_failed': job.meta['training_failed']}
+    response = {
+        'auroc': job.meta['auroc'],
+        'roc_curve': job.meta['roc_curve'],
+        'training_failed': job.meta['training_failed']
+    }
     return jsonify(response)

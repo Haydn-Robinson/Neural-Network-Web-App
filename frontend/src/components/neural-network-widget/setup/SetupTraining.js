@@ -7,12 +7,6 @@ function SetupTraining({setTaskState}) {
   const [datasetSelected, setDatasetSelected] = useState(false)
   const [datasetInfo, setDatasetInfo] = useState(null)
 
-  // const fetchDataset = async (dataset) => {
-  //   const res = await fetch(`api/data/${dataset}`);
-  //   const data = await res.json();
-  //   return data
-  // }
-
   const updateDatasetInfo = async (datasetId) => {
     const res = await fetch(`/api/datasetinfo/${datasetId}`);
     const data = await res.json();
